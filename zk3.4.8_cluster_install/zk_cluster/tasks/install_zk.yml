@@ -1,0 +1,44 @@
+---
+#- name: install zookeeper
+#  unarchive: src=zookeeper-3.4.8.jar  dest=/home/www
+
+#- name: install | Check if zookeeper local file is already configured.
+#  stat: path={{ zookeeper_file_path }}
+#  connection: local
+#  register: zookeeper_file_result
+#
+#- name: install | Create software files path.
+#  file: path={{ zk_software_files_path }} state=directory
+#  connection: local
+#  when: not zookeeper_file_result.stat.exists
+
+- name: install | cp zookeeper tar file
+  copy: src=zookeeper-3.4.8.tar.gz dest={{ zk_software_files_path }}/
+#  connection: local
+#  when: not zookeeper_file_result.stat.exists
+
+- name: install | unarchive zookeeper tar package on agent.
+  unarchive:
+    src: "{{ zk_software_files_path }}/{{ zookeeper_file}}"
+    dest: "{{ zk_software_install_path }}"
+    remote_src: yes
+    owner: www
+    group: www
+    creates: "{{ zk_software_install_path}}/zookeeper-{{ zookeeper_version }}"
+
+- name: install | Check if zookeeper remote soft link is already configured.
+  stat: path="{{ zk_software_install_path }}/zookeeper"
+  register: zookeeper_soft_link_result
+
+- name: install | Create zookeeper dir soft link.
+  file: "src={{ zk_software_install_path }}/zookeeper-{{ zookeeper_version }} dest={{ zk_software_install_path }}/zookeeper owner=www group=www mode=0644 state=link"
+  when: not zookeeper_soft_link_result.stat.exists
+
+#- name: "install | Create {{ zookeeper_user }} group."
+#  group: name={{ zookeeper_user }}
+
+#- name: "install | Create {{ zookeeper_user }} user."
+#  user: name={{ zookeeper_user }} group={{ zookeeper_user }} shell=/sbin/nologin
+
+- name: install | Config environment variable.
+  lineinfile: dest=/etc/profile line='export PATH={{ zk_software_install_path }}/zookeeper/bin/:$PATH'

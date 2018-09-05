@@ -1,0 +1,6 @@
+- name: start zookeeper
+#  remote_user: www
+#  shell: /sbin/runuser -l www -c  'export ZOO_LOG_DIR=/home/www/zookeeper-3.4.8/log && /home/www/zookeeper-3.4.8/bin/zkServer.sh start'
+  shell: su  -c  'export ZOO_LOG_DIR=/home/www/zookeeper-3.4.8/log && /home/www/zookeeper-3.4.8/bin/zkServer.sh start' www
+  tags:
+  - start

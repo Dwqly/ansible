@@ -1,0 +1,30 @@
+---
+# vars file for zookeeper
+# zk 3.4.8的配置参数
+
+zk_software_files_path: "/tmp/zk_software"
+zk_software_install_path: "/home/www"
+
+zookeeper_version: "3.4.8"
+
+zookeeper_file: "zookeeper-{{ zookeeper_version }}.tar.gz"
+zookeeper_file_path: "{{ zk_software_files_path }}/{{ zookeeper_file }}"
+
+zookeeper_user: "www"
+zookeeper_port: 2181
+zookeeper_name: "zookeeper"
+zookeeper_home: "/home/www/zookeeper-{{ zookeeper_version }}"
+zookeeper_dir: "{{ zookeeper_home }}/conf"
+zookeeper_datadir: "{{ zookeeper_home }}/data"
+zookeeper_datalogdir: "{{ zookeeper_home }}/log"
+zookeeper_hosts:
+  - {'host': 192.168.204.197, 'port': 2181 ,'id': 1, 'leader_port': '2888:3888'}
+  - {'host': 192.168.204.198, 'port': 2181 ,'id': 2, 'leader_port': '2888:3888'}
+  - {'host': 192.168.204.199, 'port': 2181 ,'id': 3, 'leader_port': '2888:3888'}
+#  - {'host': 192.168.200.12, 'port': 2181 ,'id': 3, 'leader_port': '2888:3888'}
+
+java:
+  - java-1.8.0-openjdk
+  - java-1.8.0-openjdk-devel
+  - java-1.8.0-openjdk-headless
+

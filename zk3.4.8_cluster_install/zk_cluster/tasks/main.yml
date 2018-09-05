@@ -1,0 +1,6 @@
+---
+# tasks file for elasticsearch
+- include: jdk_install.yml
+- include: install_zk.yml
+- include: conf_sync.yml
+#- include: start_server.yml

@@ -1,0 +1,7 @@
+---
+- name: install jdk 1.8 by yum
+  yum: name={{ item }} state=present
+  with_items:
+   - "{{ java }}"
+  ignore_errors: True
+  tags: jdk

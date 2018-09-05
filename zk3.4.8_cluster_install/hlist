@@ -1,0 +1,5 @@
+[hlists]
+192.168.204.197 ansible_ssh_port=10086
+192.168.204.198 ansible_ssh_port=10086
+192.168.204.199 ansible_ssh_port=10086
+#192.168.200.12
