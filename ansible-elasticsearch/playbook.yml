@@ -1,0 +1,66 @@
+---
+- name: Install Elasticsearch Cluster #说明这个playbook的目的
+  hosts: es_nodes #要运行的主机组
+  become: yes #表示以超级用户root权限执行任务
+  tasks: #任务列表
+    - name: Install Java
+      yum:
+        name: java-1.8.0-openjdk
+        state: present #表示确保软件包已经安装
+
+    - name: Add Elasticsearch GPG key #添加ES GPG密钥
+      rpm_key: #使用rpm_key模块添加ES的GPG密钥
+        state: present
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Add Elasticsearch YUM repository #添加ES yum仓库
+      yum_repository: #使用yum_repository模块添加ES的yum仓库
+        name: elasticsearch
+        description: Elasticsearch repository for 7.x packages
+        baseurl: https://artifacts.elastic.co/packages/7.x/yum
+        gpgcheck: yes #表示启用GPG密钥检查
+        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        enabled: yes
+
+    - name: Install Elasticsearch #安装ES
+      yum: #yum模块安装
+        name: elasticsearch
+        state: present
+   
+    - name: Create data and logs directories #创建日志目录
+      file: #file模块
+        path: "{{ item }}"
+        state: directory
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0755'
+      loop:
+        - /data/elasticsearch/data
+        - /data/elasticsearch/logs
+
+    - name: Configure Elasticsearch #配置ES
+      template:
+        src: elasticsearch.yml.j2
+        dest: /etc/elasticsearch/elasticsearch.yml
+      notify: restart elasticsearch
+
+    - name: Update JVM options #更新配置文件
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: '^## -Xms|^## -Xmx'
+        line: "{{ item }}"
+      loop:
+        - "-Xms1g"
+        - "-Xmx1g"
+
+    - name: Ensure Elasticsearch is running #确保ES在运行
+      service: #service模块 确保正在运行
+        name: elasticsearch
+        state: started
+        enabled: yes #设置开机自启
+
+  handlers:
+    - name: restart elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted

@@ -1,0 +1,10 @@
+[es_master]
+es-node1 ansible_host=192.168.183.144
+
+[es_data]
+es-node2 ansible_host=192.168.183.145
+es-node3 ansible_host=192.168.183.146
+
+[es_nodes:children]
+es_master
+es_data
