@@ -1,81 +1,60 @@
-zk_cluster使用说明
+ansible-elasticsearch使用说明
 =================
 
 
 ### 一、摘要
 
-    本roles是针对zk 3.4.8
-    本roles适用于centos6
+    本roles是针对es 7.x
+    本roles适用于centos7.9
 
 
-### 二、快速安装zookeeper cluster版本
+### 二、快速安装es集群
 
-    ansible-playbook -i hlist zk_cluster.yml -uroot -k -vv
+    ansible-playbook -i hosts.ini deploy_es.yml
 
-    -u 指定远程主机执行脚本的账号
-    -k 指定上面对应账号的密码
-    -vv 显示执行过程中的详情
+    -i 这个选项指定了一个清单文件
+    deploy_es.yml 这是要执行的Ansible剧本的文件名。该剧本包含了部署Elasticsearch集群所需的所有任务和配置
+    
 
-    Note: 如果做了公钥认证的话，可以使用下面的执行方式
-
-    ansible-playbook -i hlist zk_cluster.yml -vv
+    
 
 
 ### 三、注意事项
 
 >  变量注意事项
 
-    使用之前一定要修改hlist中的IP为你所需要部署服务的远程机器的IP
+    ansible-elasticsearch/inventory 这个文件定义的角色ip，按照需求更改
 
-    如果场景不同，clone该代码仓库之后，请自行修改../vars/mail.yml中的相关信息来满足当前场景的需求
+    ansible-elasticsearch/group_vars/all.yml 这个文件定义了es的版本和java的版本
 
+    ansible-elasticsearch/templates/elasticsearch.yml.j2 这个文件定义了es的配置文件但是没有加x-pack，按需更改
 
-> 变量参考
-
-```cpp
-java:
-  - java-1.8.0-openjdk
-  - java-1.8.0-openjdk-devel
-  - java-1.8.0-openjdk-headless
-
-
-```
-
-
-### 四、Ansible获取系统信息样例
-
-
-> 示范如下
-
-```cpp
-    获取myid
-    for语句遍历vars下的zookeeper_hosts字典,见myid.j2模板
     
 
-    获取zoo.cfg中的server配置,见zoo.cfg.j2中的for语句
-
-
-```
 
 
 
-### 五、zk使用
+
+
+### 五、zk集群的状态检查
 
 ```cpp
-/etc/init.d/zookeeper Usage: /etc/init.d/zookeeper {start|stop|status|sstatus|restart|condrestart}
+curl命令直接向Elasticsearch的REST API发送请求，获取集群的状态信息
+curl -X GET "http://<your-es-node>:9200/_cluster/health?pretty"
 
-启动命令：/etc/init.d/zookeeper start 关闭命令：/etc/init.d/zookeeper stop 查看状态命令：/etc/init.d/zookeeper sstatus 客户端命令：zkCli.sh -server localhost:2181
+Elasticsearch还提供了监控API，可以获取更详细的集群和节点状态信息，这个命令将返回集群的统计信息，包括节点数量、索引数量、分片状态等
+curl -X GET "http://<your-es-node>:9200/_cluster/stats?pretty"
+
+检查节点状态
+curl -X GET "http://<your-es-node>:9200/_cat/nodes?v"
+
 ```
 
 
 
-### 六、下载zookeeper安装包
 
-```cpp
-    wget http://archive.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz
-```
 
-### 七、注意事项
+### 六、注意事项
 
 ```cpp
     note: ansible version 2.3.2.0+
